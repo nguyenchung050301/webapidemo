@@ -1,4 +1,4 @@
-﻿namespace WebAPIDemo
+﻿namespace WebAPIDemo.Models
 {
     public static class ProductList
     {

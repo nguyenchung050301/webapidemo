@@ -1,4 +1,6 @@
-﻿namespace WebAPIDemo
+﻿using WebAPIDemo.Models;
+
+namespace WebAPIDemo.Services
 {
     public class ProductService
     {
