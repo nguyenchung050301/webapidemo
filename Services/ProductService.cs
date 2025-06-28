@@ -4,18 +4,14 @@ namespace WebAPIDemo.Services
 {
     public class ProductService
     {
-        public Product GetProductByID(int id, out Product ?product) //out yêu cầu biến có giá trị dù có là null hay không, ? = nullable
+        public Product GetProductByID(int id) //out yêu cầu biến có giá trị dù có là null hay không, ? = nullable
         {
-            if (id < 0)
-            {
-                throw new ArgumentNullException(nameof(id), "Product ID cannot be null");
-            }
-            product = ProductList.Products.FirstOrDefault(p => p.Id == id);
-            if (product == null)
+            var found = FindByID(id);
+            if (found == null)
             {
                 throw new KeyNotFoundException($"Product with ID {id} not found");
             }
-            return product;
+            return found ;
         }
         public List<Product> GetAllProducts()
         {
@@ -29,27 +25,25 @@ namespace WebAPIDemo.Services
             }
             products.AddRange(ProductList.Products);
         }
-        public void AddProduct(Product product)
+        public void AddProduct(ProductDTO product)
         {
-            if (product == null)
+            var _product = new Product
             {
-                throw new ArgumentNullException(nameof(product), "Product cannot be null");
-            }
-            ProductList.Products.Add(product);
+                Id = RandomID(), // Generate a unique ID
+                Description = product.Description,
+                Name = product.Name,
+                Price = product.Price,
+            };
+            ProductList.Products.Add(_product);
         }
-        public void UpdateProduct(Product product)
+        public void UpdateProduct(ProductDTO product, int ID)
         {
-            if (product == null)
-            {
-                throw new ArgumentNullException(nameof(product), "Product cannot be null");
-                //nameof(product) returns the name of the variable as a string
-            }
-            var existingProduct = ProductList.Products.FirstOrDefault(p => p.Id == product.Id);
-            //Default return default value, ex: int => 0, string => null    
+           
+            var existingProduct = FindByID(ID);   
 
             if (existingProduct == null)
             {
-                throw new KeyNotFoundException($"Product with ID {product.Id} not found");
+                throw new KeyNotFoundException($"Product with ID {ID} not found");
             }
             existingProduct.Name = product.Name;
             existingProduct.Description = product.Description;
@@ -57,12 +51,32 @@ namespace WebAPIDemo.Services
         }
         public void DeleteProductByID(int id)
         {
-            var product = ProductList.Products.FirstOrDefault(p => p.Id == id);
-            if (product == null)
+          
+            var existingProduct = FindByID(id);
+            if (existingProduct == null)
             {
                 throw new KeyNotFoundException($"Product with ID {id} not found");
             }
-            ProductList.Products.Remove(product);
+            ProductList.Products.Remove(existingProduct);
+        }
+        private Product? FindByID(int ID)
+        {
+            if (ID < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(ID), "Product ID cannot be negative.");
+            }
+
+            return ProductList.Products.FirstOrDefault(p => p.Id == ID);
+        }
+        private int RandomID()
+        {
+            Random random = new Random();
+            int id;
+            do
+            {
+                id = random.Next(1, 1000); // Generate a random ID between 1 and 1000
+            } while (ProductList.Products.Any(p => p.Id == id)); // Ensure the ID is unique
+            return id;
         }
     }
 }
