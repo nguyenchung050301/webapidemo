@@ -10,9 +10,12 @@ namespace WebAPIDemo.Controllers
     public class ProductController : Controller
     {
         private readonly ProductService _productService;
-        public ProductController(ProductService productService)
+        public ProductController(ProductService productService, ProductService productService2)
         {
+            Console.WriteLine("1:"+productService.instanceID);
+            Console.WriteLine("2:"+productService2.instanceID);
             _productService = productService;
+            _productService = productService2;
         }
         [HttpGet]
         public ActionResult<IEnumerable<Product>> GetAllProducts()
@@ -49,7 +52,7 @@ namespace WebAPIDemo.Controllers
         public IActionResult DeleteProduct(int id)
         {
          
-            _productService.DeleteProductByID(id);
+           // _productService.DeleteProductByID(id);
             return NoContent(); // Return 204 No Content if deletion is successful
         }
        
